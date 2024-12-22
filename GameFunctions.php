@@ -37,11 +37,9 @@ function initializeGame($player1Name, $player2Name) {
     }
 }
 
-
-
 // Function to create the game and insert players into the database
 function createGameWithPlayers($player1Name, $player2Name) {
-    $conn = null; 
+    $conn = null;
     try {
         $conn = getDatabaseConnection();
 
@@ -63,7 +61,7 @@ function createGameWithPlayers($player1Name, $player2Name) {
             $_SESSION['player2_id'] = $player2Id;
             $_SESSION['current_turn'] = $player1Id; // Player 1 turn
 
-            $stmt->close(); 
+            $stmt->close();
             return [
                 'game_id' => $gameId,
                 'player1_id' => $player1Id,
@@ -84,19 +82,48 @@ function createGameWithPlayers($player1Name, $player2Name) {
 }
 
 function printBoard($board) {
+    echo "<h3>Initial Board</h3>";
+    echo "<table style='border-collapse: collapse;'>";
+
     foreach ($board as $row) {
-        echo implode(' ', $row) . "\n";
+        echo "<tr>";
+        foreach ($row as $cell) {
+            // Use underscores (_) for empty cells
+            echo "<td style='width: 20px; height: 20px; text-align: center;'>{$cell}</td>";
+        }
+        echo "</tr>";
     }
+
+    echo "</table>";
 }
 
 // Show the available peices
 function printAvailablePieces($pieces) {
-    foreach ($pieces as $piece) {
-        echo "Piece ID: {$piece['ID']}, Size: {$piece['sizeX']}x{$piece['sizeY']}<br>";
-        echo "Shape:<br>{$piece['shape']}<br><br>";
-    }
-}
+    echo "<h3>Available Pieces</h3>";
+    echo "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>";
 
+    foreach ($pieces as $piece) {
+        echo "<div style='margin: 10px;'>";
+        echo "<p>Piece ID: {$piece['ID']} (Size: {$piece['sizeX']}x{$piece['sizeY']})</p>";
+
+        // Convert text-based shape into an HTML table
+        $rows = explode("\n", $piece['shape']);
+        echo "<table style='border-collapse: collapse;'>";
+        foreach ($rows as $row) {
+            echo "<tr>";
+            foreach (str_split($row) as $cell) {
+                $color = ($cell === 'X') ? 'black' : 'white';
+                echo "<td style='width: 20px; height: 20px; background: {$color};'></td>";
+            }
+            echo "</tr>";
+        }
+        echo "</table>";
+
+        echo "</div>";
+    }
+
+    echo "</div>";
+}
 
 // Print the available pieces
 function getAvailablePieces($playerId, $gameId) {
@@ -126,6 +153,5 @@ function getAvailablePieces($playerId, $gameId) {
         return [];
     }
 }
-
 
 ?>
